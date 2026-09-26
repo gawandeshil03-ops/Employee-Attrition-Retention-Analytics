@@ -1,0 +1,26 @@
+name: Build Android APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.2'
+          channel: stable
+      - name: Create Flutter project
+        run: |
+          flutter create --platforms=android --org com.shilgawande /tmp/baby_opportunity_finder
+          cp lib/main.dart /tmp/baby_opportunity_finder/lib/main.dart
+          cd /tmp/baby_opportunity_finder
+          flutter pub add url_launcher
+          flutter build apk --debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: baby-opportunity-finder-apk
+          path: /tmp/baby_opportunity_finder/build/app/outputs/flutter-apk/app-debug.apk
